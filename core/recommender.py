@@ -8,7 +8,7 @@ skill match percentages for each job listing.
 
 import json
 from typing import List, Dict, Tuple
-from core.guides import learning_guides
+from core.guides import get_guide, generate_ai_guide
 
 # Sample data - in a real implementation, these would be loaded from JSON files
 SAMPLE_RESUME_SKILLS = [
@@ -129,7 +129,7 @@ def get_recommendations(user_skills: list[str], job_listings: list[dict]) -> lis
         
         if 60 <= match_pct <= 90:
             missing = comparison["missing_skills"]
-            guides = [(skill, learning_guides.get(skill, "No guide available.")) for skill in missing]
+            guides = [(skill, generate_ai_guide(skill, user_skills, job["title"])) for skill in missing]
             
             results.append({
                 "job_title": job["title"],
