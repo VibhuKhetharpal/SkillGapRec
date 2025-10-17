@@ -1,2 +1,7 @@
 google-generativeai
 python-dotenv
+PyMuPDF
+pytesseract
+Pillow
+Flask
+markdown

@@ -43,7 +43,45 @@ learning_guides = {
 
 def get_guide(skill: str) -> str:
     """Return the static fallback guide."""
-    return learning_guides.get(skill, "No guide available.")
+    return learning_guides.get(skill, f"Learn {skill} from official docs and tutorials.")
+
+
+def generate_role_based_guide(job_title: str, matched_skills: list[str], missing_skills: list[str]) -> list[str]:
+    """
+    Generate job-specific AI learning guides using Gemini.
+    Returns a list of guide strings for each missing skill.
+    """
+    if not missing_skills:
+        return ["No missing skills — you're fully matched!"]
+
+    if not os.getenv("GEMINI_API_KEY"):
+        return [get_guide(skill) for skill in missing_skills]
+
+    prompt = f"""
+    You are an AI career mentor.
+    The candidate wants to work as a {job_title}.
+    They already know: {', '.join(matched_skills)}.
+    They need to learn: {', '.join(missing_skills)}.
+    For each missing skill, give 2-3 short actionable learning steps with specific resources.
+    Return each as a bullet point.
+    """
+
+    try:
+        model = genai.GenerativeModel(model_name="models/gemini-2.5-flash")
+        response = model.generate_content(prompt)
+        text = (response.text or "").strip()
+        
+        if not text:
+            print(f"[Gemini API] Empty response for {job_title}")
+            return [get_guide(skill) for skill in missing_skills]
+        
+        # Split by lines and filter out empty ones
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        return lines if lines else [get_guide(skill) for skill in missing_skills]
+        
+    except Exception as e:
+        print(f"[Gemini API error] {e}")
+        return [get_guide(skill) for skill in missing_skills]
 
 
 def generate_ai_guide(skill: str, user_skills: list[str], job_title: str = None) -> str:
@@ -65,12 +103,13 @@ def generate_ai_guide(skill: str, user_skills: list[str], job_title: str = None)
     try:
         model = genai.GenerativeModel(model_name="models/gemini-2.5-flash")
         response = model.generate_content(prompt)
-        text = getattr(response, "text", None)
-        if isinstance(text, str):
-            cleaned = text.strip()
-            if cleaned:
-                return cleaned
-        return get_guide(skill)
+        text = (response.text or "").strip()
+        
+        if not text:
+            print(f"[Gemini API] Empty response for {skill}")
+            return get_guide(skill)
+        
+        return text
     except Exception as e:
         print(f"[Gemini API error] {e}")
         return get_guide(skill)
