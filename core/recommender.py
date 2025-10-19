@@ -259,12 +259,14 @@ def analyze_resume(resume_text: str) -> List[Dict]:
     """
     Compare extracted resume text with multiple job roles
     and return ranked match results using AI when available.
+    Handles no matches and weak matches with appropriate messages.
     
     Args:
         resume_text: Extracted text from resume
         
     Returns:
         List of dictionaries with job analysis results, sorted by best match first
+        or special message for no matches
     """
     if not resume_text.strip():
         return []
@@ -273,6 +275,16 @@ def analyze_resume(resume_text: str) -> List[Dict]:
     ai_results = ai_compare_resume_to_jobs(resume_text)
     if ai_results:
         print("[Analyze] Using AI-powered semantic comparison")
+        # Check if best match is too weak
+        best_match = ai_results[0] if ai_results else {}
+        if best_match.get("match_percent", 0) <= 10:
+            return [{
+                "title": "No Suitable Match",
+                "matched": [],
+                "missing": [],
+                "match_percent": 0,
+                "message": "No suitable jobs found for your current skills. Try adding more relevant experience or skills."
+            }]
         return ai_results
     
     # Fallback to keyword matching
@@ -304,6 +316,17 @@ def analyze_resume(resume_text: str) -> List[Dict]:
 
     # Sort by best match first
     results.sort(key=lambda x: x["match_percent"], reverse=True)
+    
+    # Check if best match is too weak
+    if not results or results[0].get("match_percent", 0) <= 10:
+        return [{
+            "title": "No Suitable Match",
+            "matched": [],
+            "missing": [],
+            "match_percent": 0,
+            "message": "No suitable jobs found for your current skills. Try adding more relevant experience or skills."
+        }]
+    
     return results
 
 

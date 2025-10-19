@@ -156,12 +156,16 @@ def upload():
         missing_skills = best_match.get("missing", [])
         print(f"[Web] Best match: {job_title}, missing skills: {missing_skills}")
 
-        # Generate role-specific AI guides
-        print(f"[Web] Generating guides for {len(missing_skills)} missing skills")
-        best_match["guides"] = generate_role_based_guide(job_title, matched_skills, missing_skills)
-        # Convert Markdown to HTML for clean rendering
-        best_match["guides"] = [markdown.markdown(g, extensions=["extra"]) for g in best_match["guides"]]
-        print(f"[Web] Generated {len(best_match['guides'])} guides")
+        # Check if no suitable match found
+        if job_title == "No Suitable Match":
+            best_match["guides"] = [best_match.get("message", "No suitable jobs found for your current skills.")]
+        else:
+            # Generate role-specific AI guides
+            print(f"[Web] Generating guides for {len(missing_skills)} missing skills")
+            best_match["guides"] = generate_role_based_guide(job_title, matched_skills, missing_skills)
+            # Convert Markdown to HTML for clean rendering
+            best_match["guides"] = [markdown.markdown(g, extensions=["extra"]) for g in best_match["guides"]]
+            print(f"[Web] Generated {len(best_match['guides'])} guides")
 
         # Clean up uploaded file
         os.remove(file_path)
