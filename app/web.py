@@ -1,10 +1,13 @@
-from flask import Flask, request, render_template_string
+import sys
 import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from flask import Flask, request, render_template_string
 from core.parser import extract_text
 from core.recommender import analyze_resume
 from core.guides import generate_role_based_guide
 import markdown
-
 app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)

@@ -150,109 +150,68 @@ def get_recommendations(user_skills: list[str], job_listings: list[dict]) -> lis
 
 def ai_compare_resume_to_jobs(resume_text: str) -> List[Dict]:
     """
-    Use Gemini AI to semantically compare resume text with job roles.
-    Includes robust fallback to keyword matching if JSON parsing fails.
-    
-    Args:
-        resume_text: Extracted text from resume
-        
-    Returns:
-        List of dictionaries with AI-analyzed job matches, sorted by best match first
+    Optimized: single Gemini call for all jobs
     """
     try:
         if not os.getenv("GEMINI_API_KEY"):
-            print("[AI Compare] No Gemini API key found, falling back to keyword matching")
+            print("[AI Compare] No API key → fallback")
             return []
 
-        # Load job data from JSON file
         path = os.path.join(os.path.dirname(__file__), "../data/job_listings.json")
         with open(path) as f:
             job_data = json.load(f)
-        
-        print(f"[AI Compare] Loaded {len(job_data)} jobs from JSON")
-        
-        model = genai.GenerativeModel("models/gemini-2.5-flash")
-        results = []
-    except Exception as e:
-        print(f"[AI Compare] Failed to initialize: {e}")
-        return []
 
-    for job in job_data:
-        title = job["title"]
-        skills = ", ".join(job["skills"])
+        model = genai.GenerativeModel("models/gemini-2.5-flash")
+
         prompt = f"""
-        Compare this resume with '{title}'.
-        Job requires: {skills}.
-        Resume content: {resume_text[:3000]}
-        Return a JSON object with keys title, match_percent, matched_skills, missing_skills.
+        You are an AI career assistant.
+
+        Jobs and required skills:
+        {job_data}
+
+        Resume:
+        {resume_text[:3000]}
+
+        For each job return JSON list:
+        [
+          {{
+            "title": "...",
+            "match_percent": number,
+            "matched_skills": [...],
+            "missing_skills": [...]
+          }}
+        ]
         """
 
-        try:
-            print(f"[AI Compare] Processing job: {title}")
-            response = model.generate_content(prompt)
-            text = (response.text or "").strip()
-            print(f"[AI Compare] Gemini response length: {len(text)}")
+        response = model.generate_content(prompt)
+        text = (response.text or "").strip()
 
-            if not text:
-                print(f"[AI Compare] Empty Gemini output for {title}")
-                raise ValueError("Empty Gemini output")
+        if not text:
+            raise ValueError("Empty response")
 
-            print(f"[AI Compare] Raw response: {text[:200]}...")
+        # extract JSON array
+        start = text.find("[")
+        end = text.rfind("]") + 1
+        if start == -1 or end <= start:
+            raise ValueError("No JSON array found")
 
-            try:
-                # Try to extract JSON from response
-                start_idx = text.find("{")
-                end_idx = text.rfind("}") + 1
-                print(f"[AI Compare] JSON bounds: {start_idx} to {end_idx}")
-                
-                if start_idx == -1 or end_idx <= start_idx:
-                    raise ValueError("No JSON found in response")
-                
-                json_text = text[start_idx:end_idx]
-                print(f"[AI Compare] Extracted JSON: {json_text[:100]}...")
-                
-                data = json.loads(json_text)
-                print(f"[AI Compare] Successfully parsed JSON for {title}")
-                
-            except (json.JSONDecodeError, ValueError) as e:
-                print(f"[AI Compare] JSON parsing failed for {title}: {e}")
-                print(f"[AI Compare] Falling back to keyword matching")
-                # fallback: basic keyword overlap
-                import re
-                resume_words = set(re.findall(r"[A-Za-z]+", resume_text.lower()))
-                job_words = set(s.lower() for s in job["skills"])
-                matched = sorted(resume_words & job_words)
-                missing = sorted(job_words - resume_words)
-                percent = round((len(matched) / len(job_words) * 100) if job_words else 0, 1)
-                data = {
-                    "title": title,
-                    "match_percent": percent,
-                    "matched_skills": matched,
-                    "missing_skills": missing
-                }
+        data = json.loads(text[start:end])
 
-            # Convert to expected format
-            processed_result = {
-                "title": data.get("title", title),
-                "match_percent": float(data.get("match_percent", 0)),
-                "matched": data.get("matched_skills", []),
-                "missing": data.get("missing_skills", [])
-            }
-            results.append(processed_result)
-
-        except Exception as e:
-            print(f"[AI Compare Error for {title}] {e}")
+        results = []
+        for item in data:
             results.append({
-                "title": title,
-                "match_percent": 0,
-                "matched": [],
-                "missing": job["skills"]
+                "title": item.get("title", "Unknown"),
+                "match_percent": float(item.get("match_percent", 0)),
+                "matched": item.get("matched_skills", []),
+                "missing": item.get("missing_skills", [])
             })
 
-    # Sort by best match first
-    results.sort(key=lambda x: x.get("match_percent", 0), reverse=True)
-    print(f"[AI Compare] Returning {len(results)} results")
-    return results
+        results.sort(key=lambda x: x.get("match_percent", 0), reverse=True)
+        return results
+
+    except Exception as e:
+        print(f"[AI Compare Error] {e}")
+        return []
 
 
 def analyze_resume(resume_text: str) -> List[Dict]:
