@@ -149,9 +149,7 @@ def get_recommendations(user_skills: list[str], job_listings: list[dict]) -> lis
 
 
 def ai_compare_resume_to_jobs(resume_text: str) -> List[Dict]:
-    """
-    Optimized: single Gemini call for all jobs
-    """
+    
     try:
         if not os.getenv("GEMINI_API_KEY"):
             print("[AI Compare] No API key → fallback")
@@ -286,7 +284,7 @@ def analyze_resume(resume_text: str) -> List[Dict]:
             "message": "No suitable jobs found for your current skills. Try adding more relevant experience or skills."
         }]
     
-    return results
+    return results[:5]
 
 
 def display_results(results: List[Dict]) -> None:

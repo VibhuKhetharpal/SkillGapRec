@@ -19,14 +19,14 @@ def main():
     print(f"Loaded {len(resume_skills)} resume skills")
     print(f"Loaded {len(job_listings)} job listings")
 
-    # Get recommendations using the new function
+    # Get recommendations
     results = get_recommendations(resume_skills, job_listings)
 
     # Display results
     if results:
         display_results(results)
     else:
-        print("No jobs found with a 60–90% skill match.")
+        print("No jobs found with skill match greater than 60%.")
 
     # Save output to JSON for next module
     os.makedirs("output", exist_ok=True)
