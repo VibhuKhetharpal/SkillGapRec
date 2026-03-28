@@ -133,7 +133,13 @@ HTML = """
 
     <!-- Job Matches -->
     {% if matches %}
-    <h3>📄 Top matches for <em>{{ filename }}</em></h3>
+    <h3>{% if matches and matches[0].used_fallback %}
+    <div style="background:#fff3cd; border-left:4px solid #ffc107; 
+        padding:0.7rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.9rem;">
+        ⚠️ AI matching unavailable — results based on keyword matching and may be less accurate.
+    </div>
+    {% endif %}
+    📄 Top matches for <em>{{ filename }}</em></h3>
     {% for job in matches %}
     <div class="job-card">
         <h4>
