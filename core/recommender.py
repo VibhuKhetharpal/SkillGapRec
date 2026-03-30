@@ -181,7 +181,9 @@ def ai_compare_resume_to_jobs(resume_text: str) -> List[Dict]:
         ]
         """
 
-        response = model.generate_content(prompt)
+        response = model.generate_content(
+        prompt,
+        generation_config=genai.GenerationConfig(temperature=0))
         text = (response.text or "").strip()
 
         if not text:

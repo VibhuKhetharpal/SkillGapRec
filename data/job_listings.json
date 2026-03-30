@@ -1,0 +1,123 @@
+[
+    {
+      "title": "Marketing Manager",
+      "skills": [
+        "Project Management",
+        "Public Relations",
+        "Content Strategy",
+        "Team Leadership",
+        "SEO",
+        "Social Media Marketing",
+        "Market Research",
+        "Brand Management",
+        "Communication"
+      ]
+    },
+    {
+      "title": "Human Resources Manager",
+      "skills": [
+        "Recruitment",
+        "Onboarding",
+        "Conflict Resolution",
+        "Employee Engagement",
+        "Payroll",
+        "HR Compliance",
+        "Training and Development",
+        "Performance Reviews",
+        "Organizational Behavior"
+      ]
+    },
+    {
+      "title": "Financial Analyst",
+      "skills": [
+        "Financial Modeling",
+        "Excel",
+        "Forecasting",
+        "Data Analysis",
+        "Budgeting",
+        "Accounting",
+        "Valuation",
+        "Reporting",
+        "Communication"
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "skills": [
+        "Python",
+        "Data Structures",
+        "Algorithms",
+        "APIs",
+        "Databases",
+        "Git",
+        "OOP",
+        "Unit Testing",
+        "Debugging"
+      ]
+    },
+    {
+      "title": "Graphic Designer",
+      "skills": [
+        "Adobe Photoshop",
+        "Illustrator",
+        "Brand Identity",
+        "Typography",
+        "Creativity",
+        "Layout Design",
+        "Color Theory",
+        "UI Design"
+      ]
+    },
+    {
+      "title": "Sales Executive",
+      "skills": [
+        "Lead Generation",
+        "Negotiation",
+        "CRM Management",
+        "Customer Retention",
+        "Presentation",
+        "Cold Calling",
+        "Communication",
+        "Networking"
+      ]
+    },
+    {
+      "title": "Content Writer",
+      "skills": [
+        "Copywriting",
+        "SEO Writing",
+        "Editing",
+        "Proofreading",
+        "Research",
+        "WordPress",
+        "Content Strategy",
+        "Storytelling"
+      ]
+    },
+    {
+      "title": "Data Scientist",
+      "skills": [
+        "Python",
+        "Pandas",
+        "Machine Learning",
+        "Statistics",
+        "Data Visualization",
+        "SQL",
+        "Deep Learning",
+        "Communication"
+      ]
+    },
+    {
+      "title": "Product Marketing Specialist",
+      "skills": [
+        "marketing",
+        "market research",
+        "communication",
+        "teamwork",
+        "data analysis",
+        "branding",
+        "product strategy"
+      ]
+    }
+  ]
+  
