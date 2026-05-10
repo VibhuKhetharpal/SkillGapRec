@@ -1,7 +1,8 @@
-
+uploads/
+*.pdf
+*.webp
+*.pages
+data/guide_cache.json
 .env
 __pycache__/
 *.pyc
-venv/
-.venv/
-output/
